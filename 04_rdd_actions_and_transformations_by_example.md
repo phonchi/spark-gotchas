@@ -10,6 +10,8 @@
     - ShuffleMemoryManager: Thread 61 waiting for at least 1/2N of shuffle memory pool to be free - same as above
     - Our rule of thumb: 64 MB - we created simple tool that computes number of partitions as function of total size of data and writes it as simple csv file(line per data type per tenant), so we run it once in a while to update number of partitions. Sometimes, when there is huge and unpredicted spike in data volume we experience performance problems.
 
+- Whenever you have heavyweight initialization that should be done once for many RDD elements rather than once per RDD element, and if this initialization, such as creation of objects from a third-party library, cannot be serialized (so that Spark can transmit it across the cluster to the worker nodes), use mapPartitions() instead of  map(). mapPartitions() provides for the initialization to be done once per worker task/thread/partition instead of once per RDD data element.
+
 ## When to use persist():
 - spark 1.4.1+ has nice DAG visualisation - look for same transformation chains, when your DAG splits into 2+ branches, but remember that caching adds to memory pressure or takes place on disk. Dont forget to unpersist(when you can), it will help
 

@@ -1,5 +1,34 @@
 # RDD actions and Transformations by Example
 
+## Be aware of partition to improve performance
+- map,distinct…. - transformations that lose partitioner, so try to avoid them if you can - you can use mapPartitions, mapValues instead of map or reduceByKey instead of distinct etc.
+
+- newAPIHadoopFile - reading partitioned rdd from previous batch cycle loses partitioner. (https://github.com/IgorBerman/spark-gotchas)
+
+- Memory pressure and how much memory is available for each core (~ total heap * shuffle or cache fraction / number of cores)
+    - Use Spark ui metric: Shuffle spill memory/Shuffle spill disk - if you see it a lot either upgrade your hardware, or make each partition smaller, or increase shuffle fraction
+    - ShuffleMemoryManager: Thread 61 waiting for at least 1/2N of shuffle memory pool to be free - same as above
+    - Our rule of thumb: 64 MB - we created simple tool that computes number of partitions as function of total size of data and writes it as simple csv file(line per data type per tenant), so we run it once in a while to update number of partitions. Sometimes, when there is huge and unpredicted spike in data volume we experience performance problems.
+
+## When to use persist():
+- spark 1.4.1+ has nice DAG visualisation - look for same transformation chains, when your DAG splits into 2+ branches, but remember that caching adds to memory pressure or takes place on disk. Dont forget to unpersist(when you can), it will help
+
+- If not enouph memory - Use ssd disk as tmp storage(spark.local.dir=)
+
+- spark.rdd.compress=true, spark.shuffle.consolidateFiles=true
+
+## Don't copy all elements of a large RDD to the driver
+
+Instead, you can make sure the number of elements you return is capped by calling take or takeSample, or perhaps filtering or sampling your RDD.
+
+Similarly, be cautious of these other actions as well unless you are sure your dataset size is small enough to fit in memory:
+
+- countByKey
+- countByValue
+- collectAsMap
+
+If you really do need every one of these values of the RDD and the data is too big to fit into memory, you can write out the RDD to files or export the RDD to a database that is large enough to hold all the data.
+
 ## Be Smart About groupByKey
 
 [_Avoid GroupByKey_](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html) (a.k.a. _Prefer reduceByKey over groupByKey_) is one of the best known documents in Spark ecosystem.

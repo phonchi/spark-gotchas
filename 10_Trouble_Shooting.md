@@ -12,5 +12,11 @@ from http://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerro
 - (Advanced) Related to above, avoid String and heavily nested structures (like Map and nested case classes). If possible try to only use primitive types and index all non-primitives especially if you expect a lot of duplicates. Choose WrappedArray over nested structures whenever possible. Or even roll out your own serialisation - YOU will have the most information regarding how to efficiently back your data into bytes, USE IT!
 - (bit hacky) Again when caching, consider using a Dataset to cache your structure as it will use more efficient serialisation. This should be regarded as a hack when compared to the previous bullet point. Building your domain knowledge into your algo/serialisation can minimise memory/cache-space by 100x or 1000x, whereas all a Dataset will likely give is 2x - 5x in memory and 10x compressed (parquet) on disk.
 
-## Task-not-serializable-java-io-notserializabl eexception-when-calling-function
-form http://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerror-java-heap-space
+## Task-not-serializable-java-io-notserializable exception-when-calling-function
+form http://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerror-java-heap-space and
+https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/troubleshooting/javaionotserializableexception.html
+
+## Missing Dependencies in Jar Files (shaded, uber jar)
+https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/troubleshooting/missing_dependencies_in_jar_files.html
+
+

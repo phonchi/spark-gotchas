@@ -12,6 +12,8 @@
 
 - Whenever you have heavyweight initialization that should be done once for many RDD elements rather than once per RDD element, and if this initialization, such as creation of objects from a third-party library, cannot be serialized (so that Spark can transmit it across the cluster to the worker nodes), use mapPartitions() instead of  map(). mapPartitions() provides for the initialization to be done once per worker task/thread/partition instead of once per RDD data element.
 
+- Use parallelize, you won't be able to get data locality unless you write some custom partitioning code
+
 ## When to use persist():
 - spark 1.4.1+ has nice DAG visualisation - look for same transformation chains, when your DAG splits into 2+ branches, but remember that caching adds to memory pressure or takes place on disk. Dont forget to unpersist(when you can), it will help
 
